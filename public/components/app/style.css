@@ -1,0 +1,9 @@
+main.app {
+  display: grid;
+}
+
+.actions {
+  display: flex;
+  gap: 2em;
+  margin: 0.5em 1em;
+}
