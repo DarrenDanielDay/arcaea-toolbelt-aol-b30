@@ -50,8 +50,11 @@ export const App = () => {
       };
     }, [file]);
     const fetchImage = async () => {
-      const preference: UserPreference = (await api.getPreference()) ?? defaultPreference;
-      const saved = preference[name] ?? defaultPreference[name];
+      const preference: UserPreference = {
+        ...defaultPreference,
+        ...(await api.getPreference()),
+      };
+      const saved = preference[name];
       const [resource] = await mapToURLs([saved]);
       if (!resource) {
         throw new Error("Resource not found.");
@@ -76,7 +79,10 @@ export const App = () => {
       });
     };
     const pick = async () => {
-      const preference: UserPreference = await api.getPreference();
+      const preference: UserPreference = {
+        ...defaultPreference,
+        ...(await api.getPreference()),
+      };
       const candidates = await getCandidates();
       const urls = await mapToURLs(candidates);
       if (!pickerOptions.defaultSelected) {
