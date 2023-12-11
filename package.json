@@ -2,7 +2,7 @@
 	"private": true,
 	"scripts": {
 		"start": "wmr",
-		"build": "wmr build",
+		"build": "wmr build --sourcemap",
 		"serve": "wmr serve"
 	},
 	"eslintConfig": {

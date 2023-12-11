@@ -279,12 +279,18 @@ export const App = () => {
   const generatorTextColor = [0, 1, 3, 4, 8].includes(bgIndex) ? darkText : lightText;
   const footerColor = [0, 3, 5, 7].includes(bgIndex) ? darkText : lightText;
   const playerTextColor = courseImg.preference <= 6 ? darkText : lightText;
+
+  const exportImage = () => {
+    alert("暂不支持，敬请期待");
+  };
+
   return (
     <main class="app">
       <div class="actions">
         <Button onClick={avatar.pick}>选择头像</Button>
         <Button onClick={course.pick}>选择段位</Button>
         <Button onClick={bg.pick}>选择背景</Button>
+        <Button onClick={exportImage}>导出图片</Button>
       </div>
       {b30Data ? (
         <Best30
