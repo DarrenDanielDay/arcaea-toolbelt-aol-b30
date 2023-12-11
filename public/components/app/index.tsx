@@ -49,11 +49,12 @@ export const App = () => {
         }
       };
     }, [file]);
+    const getPreference = async (): Promise<UserPreference> => ({
+      ...defaultPreference,
+      ...(await api.getPreference()),
+    });
     const fetchImage = async () => {
-      const preference: UserPreference = {
-        ...defaultPreference,
-        ...(await api.getPreference()),
-      };
+      const preference: UserPreference = await getPreference();
       const saved = preference[name];
       const [resource] = await mapToURLs([saved]);
       if (!resource) {
@@ -79,10 +80,7 @@ export const App = () => {
       });
     };
     const pick = async () => {
-      const preference: UserPreference = {
-        ...defaultPreference,
-        ...(await api.getPreference()),
-      };
+      const preference = await getPreference();
       const candidates = await getCandidates();
       const urls = await mapToURLs(candidates);
       if (!pickerOptions.defaultSelected) {
