@@ -380,7 +380,7 @@ const ResultCard: FC<{ item: PlayResultItem; x: number; y: number }> = ({ x, y, 
         fill="#ffffff"
         stroke="#2d1e3e"
         font-weight="bold"
-        stroke-width={0.5}
+        stroke-width={0.35}
         clip-path="polygon(0 20, 110 20, 110 0, 0 0)"
         {...point(9, 110)}
       >
