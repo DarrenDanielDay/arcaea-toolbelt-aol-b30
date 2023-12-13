@@ -130,9 +130,9 @@ export const createDetailedImageFiles = (files: ImageFile[]) =>
 export const generateExportImageName = (): string => {
   const now = new Date();
   return `AOL-b30-${now.getFullYear()}-${formatDate(+now)} \
-  ${pad2(now.getHours())}-\
-  ${pad2(now.getMinutes())}-\
-  ${pad2(now.getSeconds())}`;
+${pad2(now.getHours())}-\
+${pad2(now.getMinutes())}-\
+${pad2(now.getSeconds())}`;
 };
 
 export const fetchAsBlob = async (url: string | URL) => {
