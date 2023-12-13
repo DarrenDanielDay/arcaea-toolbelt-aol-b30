@@ -1,6 +1,13 @@
+import { ImageFile } from "@arcaea-toolbelt/services/generator-api";
+
 export interface Vector2D {
   x: number;
   y: number;
+}
+
+export interface Size {
+  width: number;
+  height: number;
 }
 
 export enum Clear {
@@ -22,41 +29,47 @@ export enum Difficulty {
 export enum Side {
   Light,
   Conflict,
-  Colorless
+  Colorless,
 }
 
 export interface PlayResultItem {
   no: number;
-  difficultyImage: string;
+  difficultyImage: DetailedImageFile;
   level: number;
   plus?: boolean;
   potential: number;
   side: Side;
-  cover: string;
-  rankImage: string;
+  cover: DetailedImageFile;
+  rankImage: DetailedImageFile;
   score: number;
   title: string;
   clear: Clear;
 }
 
-export interface BackgroundImage {
-  url: string;
+export interface DetailedImageFile extends ImageFile {
   size: Vector2D;
+  dataURL: string;
 }
 
 export interface Best30Data {
   player: string;
   date: string;
   potential: number;
-  ratingBadge: string;
+  ratingBadge: DetailedImageFile;
   b30: PlayResultItem[];
 }
 
+export type RenderURL = keyof Pick<DetailedImageFile, "blobURL" | "distURL" | "dataURL">;
+
+export type ResourceFile = Record<RenderURL, string>;
+
 export interface Best30RenderContext extends Best30Data {
-  brand: string;
-  course: string;
-  avatar: string;
-  bg: BackgroundImage;
+  renderURL: RenderURL;
+  exoFontFile: ResourceFile;
+  brandImage: DetailedImageFile;
+  courseImage: DetailedImageFile;
+  avatarImage: DetailedImageFile;
+  backgroundImage: DetailedImageFile;
   generatorTextColor: string;
   playerTextColor: string;
   footerColor: string;

@@ -1,4 +1,5 @@
-import { Vector2D } from "../model";
+import { ImageFile } from "@arcaea-toolbelt/services/generator-api";
+import { DetailedImageFile, ResourceFile, RenderURL, Size, Vector2D } from "../model";
 
 export const grid = <T>(array: T[], cols: number): T[][] => {
   const result: T[][] = [];
@@ -59,5 +60,92 @@ export const coordinate = (x: number = 0, y: number = 0): Coordinate => {
       y: y + dy,
     }),
     translate: (dx: number = 0, dy: number = 0) => coordinate(x + dx, y + dy),
+  };
+};
+
+export const resize = ({ x, y, width, height }: Vector2D & Partial<Size>): Size => {
+  let size: Size;
+  if (width) {
+    size = {
+      width,
+      height: (y * width) / x,
+    };
+  } else if (height) {
+    size = {
+      width: (x * height) / y,
+      height,
+    };
+  } else {
+    throw new Error("Must have width or height.");
+  }
+  return size;
+};
+
+const blobURLRegistry = new FinalizationRegistry<string>((url) => {
+  console.debug(`Revoking Object URL: ${url}`);
+  return URL.revokeObjectURL(url);
+});
+
+export const managedBlobURL = (blob: Blob): string => {
+  const url = URL.createObjectURL(blob);
+  blobURLRegistry.register(blob, url);
+  return url;
+};
+
+export const blob2DataURL = (blob: Blob) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === "string") {
+        resolve(result);
+      } else {
+        reject("Unexpected reader result.");
+      }
+    };
+    reader.readAsDataURL(blob);
+  });
+
+export const createDetailedImageFile = async (file: ImageFile): Promise<DetailedImageFile> => {
+  const blob = file.blob;
+  const blobURL = managedBlobURL(blob);
+  const dataURL = await blob2DataURL(blob);
+  const bitmap = await createImageBitmap(blob);
+  const size: Vector2D = {
+    x: bitmap.width,
+    y: bitmap.height,
+  };
+  bitmap.close();
+  return {
+    ...file,
+    blobURL,
+    size,
+    dataURL,
+  };
+};
+
+export const createDetailedImageFiles = (files: ImageFile[]) =>
+  Promise.all(files.map((file) => createDetailedImageFile(file)));
+
+export const generateExportImageName = (): string => {
+  const now = new Date();
+  return `AOL-b30-${now.getFullYear()}-${formatDate(+now)} \
+  ${pad2(now.getHours())}-\
+  ${pad2(now.getMinutes())}-\
+  ${pad2(now.getSeconds())}`;
+};
+
+export const fetchAsBlob = async (url: string | URL) => {
+  const res = await fetch(url);
+  return res.blob();
+};
+
+export const fetchAsResource = async (url: string | URL): Promise<ResourceFile> => {
+  const dist = new URL(url);
+  const blob = await fetchAsBlob(dist);
+  return {
+    blobURL: managedBlobURL(blob),
+    dataURL: await blob2DataURL(blob),
+    distURL: dist.href,
   };
 };

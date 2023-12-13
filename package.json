@@ -9,6 +9,7 @@
 		"extends": "preact"
 	},
 	"dependencies": {
+		"canvg": "^4.0.1",
 		"preact": "^10.19.2",
 		"preact-iso": "^2.3.2"
 	},

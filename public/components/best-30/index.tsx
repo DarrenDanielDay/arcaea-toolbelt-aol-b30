@@ -1,6 +1,6 @@
 import { FunctionComponent as FC } from "preact";
-import { PlayResultItem, Side, Best30RenderContext } from "../../model";
-import { coordinate, grid } from "../../utils/misc";
+import { PlayResultItem, Side, Best30RenderContext, RenderURL } from "../../model";
+import { Coordinate, coordinate, grid, resize } from "../../utils/misc";
 
 const parsePotential = (potential: number) => {
   const integer = Math.floor(potential * 100);
@@ -25,29 +25,43 @@ export const width = 900;
 export const height = 1046;
 
 export const Best30: FC<Best30RenderContext> = ({
-  brand,
+  brandImage,
+  exoFontFile,
   player,
-  avatar,
-  course,
+  avatarImage,
+  courseImage,
   playerTextColor,
-  bg,
+  backgroundImage,
   generatorTextColor,
   footerColor,
   date,
   potential,
   ratingBadge,
   b30,
+  renderURL,
 }) => {
   const { decimal, fixed } = parsePotential(potential);
+  const root = coordinate(0, 0);
+  const { point, translate } = root;
   const gridX = 42,
     gridY = 176;
-  const { size } = bg;
-  const widthZoom = width / size.x,
-    heightZoom = height / size.y;
+  const { size: bgSize } = backgroundImage;
+  const { x: renderWidth, y: renderHeight } = point(width, height);
+  const widthZoom = renderWidth / bgSize.x,
+    heightZoom = renderHeight / bgSize.y;
   const bgWidthHeightProps =
-    widthZoom > heightZoom ? { width, height: size.y * widthZoom } : { width: size.x * heightZoom, height };
+    widthZoom > heightZoom
+      ? { width: renderWidth, height: bgSize.y * widthZoom }
+      : { width: bgSize.x * heightZoom, height: renderHeight };
   return (
-    <svg class="b30" xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${width} ${height}`} width={width} height={height}>
+    <svg
+      class="b30"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={`0 0 ${renderWidth} ${renderHeight}`}
+      width={renderWidth}
+      height={renderHeight}
+    >
+      <style>{`@font-face{font-family: Exo;src: url("${[exoFontFile[renderURL]]}") format("woff2");}`}</style>
       <defs>
         {/* 模糊背景面板 */}
         <filter id="bg-blur-filter">
@@ -73,19 +87,27 @@ export const Best30: FC<Best30RenderContext> = ({
           <clipPath id="course-right">
             <rect width={230} height={37}></rect>
           </clipPath>
-          <image href={course} height={37} clip-path="url(#course-right)"></image>
+          <image
+            href={courseImage[renderURL]}
+            {...resize({ height: 37, ...courseImage.size })}
+            clip-path="url(#course-right)"
+          ></image>
         </g>
 
         {/* 背景图片 */}
-        <image id="bg" href={bg.url} {...bgWidthHeightProps}></image>
+        <image id="bg" href={backgroundImage[renderURL]} {...bgWidthHeightProps}></image>
 
         {/* 头像和潜力值 */}
         <g id="avatar-and-potential">
           <filter id="avatar-shadow">
             <feDropShadow dx={0} dy={0} stdDeviation={3} flood-color="#231731"></feDropShadow>
           </filter>
-          <image href={avatar} height={71} filter="url(#avatar-shadow)"></image>
-          <image href={ratingBadge} x={39} y={31} width={44}></image>
+          <image
+            href={avatarImage[renderURL]}
+            {...resize({ ...avatarImage.size, height: 71 })}
+            filter="url(#avatar-shadow)"
+          ></image>
+          <image href={ratingBadge[renderURL]} {...resize({ width: 44, ...ratingBadge.size })} x={39} y={31}></image>
           <text
             font-family="Exo"
             text-anchor="end"
@@ -116,7 +138,7 @@ export const Best30: FC<Best30RenderContext> = ({
         <g id="player-info">
           <use href="#course-banner"></use>
           <use href="#avatar-and-potential" x={183} y={-15}></use>
-          <text x={105} y={25} text-anchor="middle" fill={playerTextColor}>
+          <text x={105} y={25} text-anchor="middle" font-size={16} fill={playerTextColor}>
             {player}
           </text>
         </g>
@@ -133,12 +155,17 @@ export const Best30: FC<Best30RenderContext> = ({
       <ResultCardDefs />
       <use href="#bg"></use>
       <use href="#panel"></use>
-      <image href={brand} width={300} y={24}></image>
+      <image href={brandImage[renderURL]} {...resize({ ...brandImage.size, width: 300 })} y={24}></image>
       <use href="#generator-info" x={666} y={80}></use>
       <use href="#player-info" x={330} y={100}></use>
       {grid(b30, 5).flatMap((row, i) =>
         row.map((col, j) => (
-          <ResultCard key={`${i}-${j}`} item={col} x={gridX + j * 168} y={gridY + i * 136}></ResultCard>
+          <ResultCard
+            key={`${i}-${j}`}
+            item={col}
+            renderURL={renderURL}
+            coordinate={translate(gridX + j * 168, gridY + i * 136)}
+          ></ResultCard>
         ))
       )}
     </svg>
@@ -314,9 +341,13 @@ const ResultCardDefs: FC = () => (
   </defs>
 );
 
-const ResultCard: FC<{ item: PlayResultItem; x: number; y: number }> = ({ x, y, item }) => {
+const ResultCard: FC<{ item: PlayResultItem; coordinate: Coordinate; renderURL: RenderURL }> = ({
+  coordinate,
+  item,
+  renderURL,
+}) => {
   const { cover, difficultyImage, level, no, potential, rankImage, score, plus, title, side, clear } = item;
-  const { point } = coordinate(x, y);
+  const { point } = coordinate;
   const { decimal, fixed } = parsePotential(potential);
   return (
     <g>
@@ -345,7 +376,7 @@ const ResultCard: FC<{ item: PlayResultItem; x: number; y: number }> = ({ x, y, 
       <use href="#dot" {...point(25, 61)}></use>
       <rect width={9} height={1} fill="url(#right-fading-line)" {...point(31, 61)}></rect>
       <use href="#hexagon" fill="#dad7e8" {...point(25, 77)}></use>
-      <image href={rankImage} width={36} height={36} {...point(7, 59)}></image>
+      <image href={rankImage[renderURL]} width={36} height={36} {...point(7, 59)}></image>
       <rect
         width={95}
         height={95}
@@ -355,8 +386,8 @@ const ResultCard: FC<{ item: PlayResultItem; x: number; y: number }> = ({ x, y, 
         {...point(47, 4)}
       ></rect>
       <rect width={91} height={91} fill="#291b39" {...point(48, 5)}></rect>
-      <image href={cover} width={87} height={87} {...point(50, 7)}></image>
-      <image href={difficultyImage} width={36} height={36} {...point(122, -12)}></image>
+      <image href={cover[renderURL]} width={87} height={87} {...point(50, 7)}></image>
+      <image href={difficultyImage[renderURL]} width={36} height={36} {...point(122, -12)}></image>
       <text fill="#ffffff" text-anchor="middle" font-size={10} {...point(140, 10)}>
         {level}
         {plus ? "+" : ""}
