@@ -1,9 +1,23 @@
 main.app {
-  display: grid;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
 }
 
 .actions {
+  box-sizing: border-box;
+  background-color: var(--bg);
+  width: 100%;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
   display: flex;
-  gap: 2em;
-  margin: 0.5em 1em;
+  align-items: center;
+  gap: 1em;
+  padding: 0.5em 1em;
+}
+
+.b30-container {
+  width: 100%;
+  overflow-x: scroll;
 }

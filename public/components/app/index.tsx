@@ -1,6 +1,5 @@
 import { Canvg } from "canvg";
 import { Button } from "../button";
-import "preact-material-components/Button/style.css";
 import "./style.css";
 import { useEffect, useState } from "preact/hooks";
 import brand from "../../assets/title.png";
@@ -27,6 +26,7 @@ import {
   generateExportImageName,
 } from "../../utils/misc";
 import { render } from "preact";
+import { Slider } from "../slider";
 
 interface UserPreference {
   avatar: CharacterImage;
@@ -48,6 +48,7 @@ export const App = () => {
   const [ctx, setCtx] = useState<StartUpContext>();
   const [b30Data, setB30Data] = useState<Best30Data>();
   const [ratingBadge, setRatingBadge] = useState<DetailedImageFile>();
+  const [scale, setScale] = useState(1);
   const usePicker = <P extends keyof UserPreference>(
     name: P,
     getCandidates: () => Promise<UserPreference[P][]>,
@@ -309,15 +310,17 @@ export const App = () => {
     footerColor,
     brandImage,
     exoFontFile,
+    scale,
     ...b30Data,
     renderURL: "blobURL",
   };
+  const pngQuality = scale < 2 ? "高糊" : scale < 3 ? "还行" : "高清";
   const renderSVG = async (renderURL: RenderURL) => {
     const container = document.createElement("div");
+    console.log(best30RenderContext);
     render(<Best30 {...best30RenderContext} renderURL={renderURL}></Best30>, container);
     await Promise.resolve();
     const svg = container.innerHTML;
-
     return svg;
   };
 
@@ -354,11 +357,29 @@ export const App = () => {
         <Button onClick={avatar.pick}>选择头像</Button>
         <Button onClick={course.pick}>选择段位</Button>
         <Button onClick={bg.pick}>选择背景</Button>
-        <Button onClick={exportPNG}>导出高糊png</Button>
+        <Button onClick={exportPNG}>导出{pngQuality}png</Button>
         <Button onClick={exportInlinedSVG}>导出内联svg</Button>
         <Button onClick={exportExternedSVG}>导出外链svg</Button>
+        <Slider
+          id="scale"
+          value={scale}
+          onInput={(e) => {
+            const { target } = e;
+            if (!(target instanceof HTMLInputElement)) {
+              return;
+            }
+            setScale(+target.value);
+          }}
+          min={1}
+          max={4}
+          step={0.5}
+        >
+          放缩尺寸
+        </Slider>
       </div>
-      <Best30 {...best30RenderContext}></Best30>
+      <div class="b30-container">
+        <Best30 {...best30RenderContext}></Best30>
+      </div>
     </main>
   );
 };

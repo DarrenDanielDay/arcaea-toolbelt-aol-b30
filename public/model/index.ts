@@ -64,6 +64,7 @@ export type RenderURL = keyof Pick<DetailedImageFile, "blobURL" | "distURL" | "d
 export type ResourceFile = Record<RenderURL, string>;
 
 export interface Best30RenderContext extends Best30Data {
+  scale: number;
   renderURL: RenderURL;
   exoFontFile: ResourceFile;
   brandImage: DetailedImageFile;

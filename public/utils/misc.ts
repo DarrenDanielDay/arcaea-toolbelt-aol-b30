@@ -50,16 +50,27 @@ export const future: {
 
 export interface Coordinate {
   point: (dx?: number, dy?: number) => Vector2D;
+  size: (size: Size) => Size;
+  zoom: (num: number) => number;
+  vectors: (seq: string) => string;
   translate: (dx?: number, dy?: number) => Coordinate;
 }
 
-export const coordinate = (x: number = 0, y: number = 0): Coordinate => {
+export const coordinate = (x: number = 0, y: number = 0, scale: number = 1): Coordinate => {
   return {
     point: (dx: number = 0, dy: number = 0): Vector2D => ({
-      x: x + dx,
-      y: y + dy,
+      x: (x + dx) * scale,
+      y: (y + dy) * scale,
     }),
-    translate: (dx: number = 0, dy: number = 0) => coordinate(x + dx, y + dy),
+    size: ({ width, height }) => ({ width: width * scale, height: height * scale }),
+    zoom: (num) => num * scale,
+    vectors: (seq) =>
+      seq
+        .split(" ")
+        .filter((c) => !!c.trim())
+        .map((pair) => pair.split(",").map((num) => +num * scale))
+        .join(" "),
+    translate: (dx: number = 0, dy: number = 0) => coordinate(x + dx, y + dy, scale),
   };
 };
 
