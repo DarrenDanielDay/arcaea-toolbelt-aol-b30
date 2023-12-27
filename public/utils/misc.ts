@@ -158,6 +158,7 @@ export const fetchAsResource = async (url: string | URL): Promise<ResourceFile> 
   const dist = new URL(url);
   const blob = await fetchAsBlob(dist);
   return {
+    blob,
     blobURL: managedBlobURL(blob),
     dataURL: await blob2DataURL(blob),
     distURL: dist.href,

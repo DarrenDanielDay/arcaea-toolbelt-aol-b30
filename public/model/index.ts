@@ -7,9 +7,11 @@ export interface UserPreference {
   avatar: CharacterImage | string;
   course: number;
   // 字符串是legacy配置，是assets路径，为了兼容
-  bg: string | {
-    url: string;
-  };
+  bg:
+    | string
+    | {
+        url: string;
+      };
 }
 
 export interface StartUpContext {
@@ -81,7 +83,9 @@ export interface Best30Data {
 
 export type RenderURL = keyof Pick<DetailedImageFile, "blobURL" | "distURL" | "dataURL">;
 
-export type ResourceFile = Record<RenderURL, string>;
+export interface ResourceFile extends Record<RenderURL, string> {
+  blob: Blob;
+}
 
 export interface Best30RenderContext extends Best30Data {
   scale: number;
