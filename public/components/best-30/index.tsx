@@ -105,7 +105,7 @@ export const Best30: FC<Best30RenderContext> = ({
           </filter>
           <image
             href={avatarImage[renderURL]}
-            {...size(resize({ ...avatarImage.size, height: 71 }))}
+            {...size(resize({ ...avatarImage.size, height: 72 }))}
             filter="url(#avatar-shadow)"
           ></image>
           <image
@@ -158,7 +158,11 @@ export const Best30: FC<Best30RenderContext> = ({
       <ResultCardDefs coordinate={root} />
       <use href="#bg"></use>
       <use href="#panel"></use>
-      <image href={brandImage[renderURL]} {...size(resize({ ...brandImage.size, width: 300 }))} {...point(0, 24)}></image>
+      <image
+        href={brandImage[renderURL]}
+        {...size(resize({ ...brandImage.size, width: 300 }))}
+        {...point(0, 24)}
+      ></image>
       <use href="#generator-info" {...point(666, 80)}></use>
       <use href="#player-info" {...point(330, 100)}></use>
       {grid(b30, 5).flatMap((row, i) =>

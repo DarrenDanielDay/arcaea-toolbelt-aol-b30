@@ -5,10 +5,6 @@ export default defineConfig((options) => {
   const project = "arcaea-toolbelt-aol-b30";
   return {
     /* Your configuration here */
-    alias: {
-      react: "preact/compat",
-      "react-dom": "preact/compat",
-    },
     port: 1237,
     publicPath: options.mode === "build" ? `/${project}/` : "/",
   };

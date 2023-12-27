@@ -1,4 +1,24 @@
-import { ImageFile } from "@arcaea-toolbelt/services/generator-api";
+import { CharacterImage } from "@arcaea-toolbelt/models/character";
+import { HostAPI, ImageFile } from "@arcaea-toolbelt/services/generator-api";
+import { RPCConnection } from "@arcaea-toolbelt/utils/rpc";
+
+export type ArcaeaToolbeltGeneratorAPI = typeof import("@arcaea-toolbelt/services/generator-api");
+export interface UserPreference {
+  avatar: CharacterImage | string;
+  course: number;
+  // 字符串是legacy配置，是assets路径，为了兼容
+  bg: string | {
+    url: string;
+  };
+}
+
+export interface StartUpContext {
+  atb: ArcaeaToolbeltGeneratorAPI;
+  connection: RPCConnection<HostAPI>;
+  defaultPreference: UserPreference;
+  brandImage: DetailedImageFile;
+  exoFontFile: ResourceFile;
+}
 
 export interface Vector2D {
   x: number;

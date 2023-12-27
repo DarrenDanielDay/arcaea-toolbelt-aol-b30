@@ -1,5 +1,8 @@
 import { ImageFile } from "@arcaea-toolbelt/services/generator-api";
-import { DetailedImageFile, ResourceFile, RenderURL, Size, Vector2D } from "../model";
+import { DetailedImageFile, ResourceFile, Size, Vector2D } from "../model";
+import { ClipConfig, Position, Rectangle, RenderContext, Vecter2D } from "@arcaea-toolbelt/utils/image-clip";
+
+export type PromiseOr<T> = T | Promise<T>;
 
 export const grid = <T>(array: T[], cols: number): T[][] => {
   const result: T[][] = [];
@@ -158,5 +161,64 @@ export const fetchAsResource = async (url: string | URL): Promise<ResourceFile> 
     blobURL: managedBlobURL(blob),
     dataURL: await blob2DataURL(blob),
     distURL: dist.href,
+  };
+};
+
+export const getAreaColor = (context: RenderContext, area: Rectangle): number[] => {
+  const imageData = context.getImageData(area.position.x, area.position.y, area.size.x, area.size.y);
+  /* For area debug
+  queueMicrotask(async () => {
+    const c = new OffscreenCanvas(area.size.x, area.size.y);
+    c.getContext("2d")!.putImageData(imageData, 0, 0);
+    window.open(URL.createObjectURL(await c.convertToBlob()), '_blank');
+  });
+  //*/
+  const { data } = imageData;
+  const bpe = 4;
+  const rgba = data.reduce(
+    (acc, v, i) => {
+      acc[i % bpe] += v;
+      return acc;
+    },
+    Array.from({ length: bpe }, () => 0)
+  );
+  const average = rgba.map((v) => (v * bpe) / data.byteLength);
+  return average;
+};
+
+export const diamond = (width: number): ClipConfig => {
+  const rectSize: Vecter2D = { x: width, y: width };
+  const halfRectSize: Vecter2D = { x: width / 2, y: width / 2 };
+  const position: Vecter2D = { x: -halfRectSize.x, y: -halfRectSize.y };
+  const clipPath = `m\
+ 0,${-halfRectSize.y}\
+ ${halfRectSize.x},${halfRectSize.y}\
+ ${-halfRectSize.x},${halfRectSize.y}\
+ ${-halfRectSize.x},${-halfRectSize.y}\
+ z`;
+  return {
+    area: {
+      position,
+      size: rectSize,
+    },
+    clipPath,
+  };
+};
+
+export const rect = (rectSize: Vecter2D): ClipConfig => {
+  const halfRectSize: Vecter2D = { x: rectSize.x / 2, y: rectSize.y / 2 };
+  const rectStart: Position = { x: -halfRectSize.x, y: -halfRectSize.y };
+  const clipPath = `m\
+ ${rectStart.x},${rectStart.y}\
+ ${rectSize.x},0\
+ 0,${rectSize.y}\
+ ${-rectSize.x},0\
+z`;
+  return {
+    area: {
+      position: rectStart,
+      size: rectSize,
+    },
+    clipPath,
   };
 };
