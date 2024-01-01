@@ -1,6 +1,6 @@
 import { FunctionComponent as FC } from "preact";
 import { PlayResultItem, Side, Best30RenderContext, RenderURL } from "../../model";
-import { Coordinate, coordinate, grid, resize } from "../../utils/misc";
+import { Coordinate, coordinate, grid, pointStr, resize } from "../../utils/misc";
 
 const parsePotential = (potential: number) => {
   const integer = Math.floor(potential * 100);
@@ -231,11 +231,6 @@ const ResultCardDefs: FC<{ coordinate: Coordinate }> = ({ coordinate: { point, s
       <stop offset="100%" stop-color="rgba(41, 27, 57, 1)"></stop>
     </linearGradient>
 
-    {/* 曲名裁剪 */}
-    <clipPath id="song-title-clip">
-      <rect {...point(0, -20)} {...size({ width: 100, height: 40 })}></rect>
-    </clipPath>
-
     {/* 通关评级 */}
     <polygon id="clear-hexagon" points={vectors("-5,12 4,12 15,0 4,-12 -5,-12 -16,0")}></polygon>
     <g id="fail">
@@ -438,17 +433,17 @@ const ResultCard: FC<{ item: PlayResultItem; coordinate: Coordinate; renderURL: 
       >
         {formatScore(score)}
       </text>
+      <path id={`song-title-path-${no}`} d={`M ${pointStr(point(9, 110))} l ${zoom(110)},0`}></path>
       <text
+        class="song-title"
         font-size={zoom(12)}
         font-family="Exo"
         fill="#ffffff"
         stroke="#2d1e3e"
         font-weight="bold"
         stroke-width={zoom(0.35)}
-        clip-path={`polygon(0 ${zoom(20)}, ${zoom(110)} ${zoom(20)}, ${zoom(110)} 0, 0 0)`}
-        {...point(9, 110)}
       >
-        {title}
+        <textPath xlink:href={`#song-title-path-${no}`}>{title}</textPath>
       </text>
       <use href={`#${clear}`} {...point(138, 95)}></use>
     </g>

@@ -77,6 +77,8 @@ export const coordinate = (x: number = 0, y: number = 0, scale: number = 1): Coo
   };
 };
 
+export const pointStr = (v: Vecter2D) => `${v.x},${v.y}`;
+
 export const resize = ({ x, y, width, height }: Vector2D & Partial<Size>): Size => {
   let size: Size;
   if (width) {
