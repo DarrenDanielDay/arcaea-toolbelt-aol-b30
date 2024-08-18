@@ -248,7 +248,7 @@ const useCoursePicker = (
     const result = await api.pickImage(
       urls.map((url, i) => ({
         url,
-        rank: i + 1,
+        index: i,
       })),
       {
         title: "选择段位",
@@ -261,7 +261,7 @@ const useCoursePicker = (
     const preference = await getPreference();
     const newPreference: UserPreference = {
       ...preference,
-      course: result.candidate.rank,
+      banner: banners[result.candidate.index],
     };
     await api.savePreference(newPreference);
     await fetch();
