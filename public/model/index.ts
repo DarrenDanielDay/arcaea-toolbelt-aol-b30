@@ -1,11 +1,14 @@
+import { Banner } from "@arcaea-toolbelt/models/assets";
 import { CharacterImage } from "@arcaea-toolbelt/models/character";
 import { HostAPI, ImageFile } from "@arcaea-toolbelt/services/generator-api";
 import { RPCConnection } from "@arcaea-toolbelt/utils/rpc";
 
 export type ArcaeaToolbeltGeneratorAPI = typeof import("@arcaea-toolbelt/services/generator-api");
+
 export interface UserPreference {
   avatar: CharacterImage | string;
   course: number;
+  banner?: Banner;
   // 字符串是legacy配置，是assets路径，为了兼容
   bg:
     | string
@@ -98,4 +101,12 @@ export interface Best30RenderContext extends Best30Data {
   generatorTextColor: string;
   playerTextColor: string;
   footerColor: string;
+}
+
+export function getBanner(preference: UserPreference, atb: ArcaeaToolbeltGeneratorAPI): Banner {
+  if (preference.banner) return preference.banner;
+  return {
+    type: atb.BannerType.Course,
+    level: preference.course ?? 1,
+  };
 }

@@ -7,6 +7,7 @@ import {
   Best30Data,
   Best30RenderContext,
   DetailedImageFile,
+  getBanner,
   RenderURL,
   StartUpContext,
   UserPreference,
@@ -31,7 +32,6 @@ import { Slider } from "../slider";
 const darkText = "#231731";
 const lightText = "#ffffff";
 const bgPaths = ["img/bg_light.jpg", ...Array.from({ length: 8 }, (_, i) => `img/world/1080/${i + 1}.jpg`)];
-const coursePath = (rank: number) => `img/course/banner/${rank}.png`;
 
 const useAvatarPicker = (
   atb: ArcaeaToolbeltGeneratorAPI,
@@ -221,14 +221,20 @@ const useBgPicker = (api: HostAPI, getPreference: () => Promise<UserPreference>)
   };
 };
 
-const useCoursePicker = (api: HostAPI, getPreference: () => Promise<UserPreference>) => {
+const useCoursePicker = (
+  atb: ArcaeaToolbeltGeneratorAPI,
+  api: HostAPI,
+  getPreference: () => Promise<UserPreference>
+) => {
   const [state, setState] = useState<{
     image: DetailedImageFile;
     playerTextColor: string;
   }>();
   const fetch = async () => {
-    const { course } = await getPreference();
-    const [url] = await api.resolveAssets([coursePath(course)]);
+    const preference = await getPreference();
+    const { course } = preference;
+    const { banners } = await api.getAssetsInfo();
+    const [url] = await api.resolveBanners([getBanner(preference, atb)]);
     const [image] = await api.getImages([url]);
     const detailed = await createDetailedImageFile(image!);
     setState({
@@ -237,7 +243,8 @@ const useCoursePicker = (api: HostAPI, getPreference: () => Promise<UserPreferen
     });
   };
   const pick = async () => {
-    const urls = await api.resolveAssets(Array.from({ length: 11 }, (_, i) => coursePath(i + 1)));
+    const { banners } = await api.getAssetsInfo();
+    const urls = await api.resolveBanners(banners);
     const result = await api.pickImage(
       urls.map((url, i) => ({
         url,
@@ -279,7 +286,7 @@ export const Generator: FC<{
   });
   const avatar = useAvatarPicker(atb, api, getPreference);
   const bg = useBgPicker(api, getPreference);
-  const course = useCoursePicker(api, getPreference);
+  const course = useCoursePicker(atb, api, getPreference);
   useEffect(() => {
     queueMicrotask(async () => {
       await Promise.all([avatar.fetch(), bg.fetch(), course.fetch()]);
