@@ -55,6 +55,7 @@ export enum Side {
   Light,
   Conflict,
   Colorless,
+  Lephon,
 }
 
 export interface PlayResultItem {

@@ -183,6 +183,7 @@ const sideShadowColors: Record<Side, string> = {
   [Side.Light]: "#376e99",
   [Side.Conflict]: "#8456b3",
   [Side.Colorless]: "#d4c6d4",
+  [Side.Lephon]: "#e3ddc6",
 };
 
 const ResultCardDefs: FC<{ coordinate: Coordinate }> = ({ coordinate: { point, size, zoom, vectors } }) => (
